@@ -1,41 +1,43 @@
-function test(delay, callback){
-    setTimeout(function(){
-        callback();
-    },delay);
+function test(delay){
+
+    return new Promise(function(resolve, reject){
+        setTimeout(function(){
+            //특정 문제가 없으면 resolve 실행해서 내보냄
+            resolve();
+            //특정 문제가 있으면 reject를 실행해서 내보냄
+            //reject();
+        },delay);
+    })
 }
 
-console.log("start");
-
-test(2000,function(){
+test(2000)
+.then(function(){
     console.log("callback1");
 
-    test(2000,function(){
-        console.log("callback2");
+    return test(3000);
+})
+.then(function(){
+    console.log("callback2");
 
-        test(2000, function(){
-            console.log("callback3");
-
-            test(2000, function(){
-                console.log("end");
-            })
-        })
-    })
+    return test(2000);
+})
+.then (function(){
+    console.log("callback3");
 })
 
+
+
 /*
-1. start 콘솔문 실행
-2. test() 함수 실행
-3. web_api가 1초 뒤에 setTimeout실행
-4. console.log("callback1"), 두번째 test()함수를 callstack에 전달
-5. callstack이 console.log("callback1")실행. 두번째 test()함수 실행
-6. 두번째 test함수 안쪽의 setTimeout을 다시 web_api에게 전달
-7. 위의 단계 반복
+promise 를 통해서 인스턴스 객체를 내보낼 수 있는데 해당 객체 안에는
+동기화돼서 실행되는 콜백함수를 내보냄
 
-콜백을 통한 동기화 방식의 원리는
-순차적으로 실행하라 모든 함수들을 하나의 callback함수에 넣어서
-콜스택이 다음에 실행할 함수가 없도록 만듦
+특정 함수 안쪽에 비동기적으로 실행되는 코드가 있을때 해당코드를 promise를 new 연산자로 인스턴스를 내보냄 -- 이때 상황에 따라서 resolve, reject 객체를 내보냄
 
-단점- 코드의 뎁스가 깊어지면서 지저분해짐 (callback hell)
+resolve - 해당 함수가 아무런 문제없이 동작될 때 내보내지는 객체
+reject - 해당 함수가 실행될 때 특정 오류를 발생하면 내보내지는 객체
+
+만약 promise의 리턴값으로 resolve객체가 내보내지게 되면 .then함수 호출 가능
+만약 promise의 리턴값으로 reject객체가 내보내지게 되면 catch함수를 호출 가능
 
 */
 
